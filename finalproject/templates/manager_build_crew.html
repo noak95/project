@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>FlyTAU – Build Crew</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+
+  <style>
+  .crew-grid{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  margin: 16px auto 0;
+  justify-content: center;
+  align-items: start;
+  max-width: 900px;
+  width: 100%;
+  }
+
+  .crew-card{
+    border: 1px solid #e6e8f0;
+    border-radius: 18px;
+    background: #fff;
+    padding: 16px;
+  }
+  .crew-card h2{
+    margin: 0 0 12px 0;
+    font-size: 18px;
+    font-weight: 900;
+    color: #111827;
+  }
+
+  .crew-list{
+    display:flex;
+    flex-direction:column;
+    gap: 10px;
+  }
+
+  .crew-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap: 12px;
+    padding: 12px 14px;
+    border: 1px solid #e6e8f0;
+    border-radius: 16px;
+    background: #fff;
+    transition: border-color .15s ease, box-shadow .15s ease, transform .06s ease;
+  }
+  .crew-row:hover{
+    border-color: rgba(37,99,235,0.35);
+    box-shadow: 0 12px 26px rgba(37,99,235,0.10);
+    transform: translateY(-1px);
+  }
+
+  .crew-left{
+    display:flex;
+    align-items:center;
+    gap: 30px;
+    min-width: 0;
+  }
+
+  .crew-row input[type="checkbox"]{
+    position:absolute;
+    opacity:0;
+    pointer-events:none;
+  }
+
+  .tick{
+    width: 18px;
+    height: 18px;
+    border-radius: 6px;
+    border: 2px solid #cbd5e1;
+    background:#fff;
+    flex: 0 0 auto;
+    position: relative;
+    transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
+  }
+
+  .crew-row input[type="checkbox"]:checked + .tick{
+    border-color:#2563eb;
+    background:#2563eb;
+    box-shadow: 0 0 0 4px rgba(37,99,235,0.16);
+  }
+  .crew-row input[type="checkbox"]:checked + .tick::after{
+    content:"";
+    position:absolute;
+    left: 5px;
+    top: 2px;
+    width: 5px;
+    height: 9px;
+    border: 2px solid #fff;
+    border-top: 0;
+    border-left: 0;
+    transform: rotate(45deg);
+  }
+
+  .crew-name{
+    font-weight: 900;
+    color:#111827;
+    font-size: 14px;
+    margin:0;
+    line-height: 1.2;
+  }
+  .crew-id{
+    font-size: 12px;
+    color:#6b7280;
+    margin: 2px 0 0 0;
+  }
+
+  .crew-text{
+    direction: rtl;
+    text-align: right;
+  }
+
+  .badge{
+    padding: 6px 10px;
+    border-radius: 999px;
+    border: 1px solid #e6e8f0;
+    background: #f8f9ff;
+    font-weight: 800;
+    font-size: 12px;
+    color:#111827;
+    white-space: nowrap;
+  }
+  .form-actions{
+    margin-top: auto;
+    padding-top: 18px;
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+
+  .form-actions .btn{
+    width: auto !important;
+    min-width: 240px;
+  }
+
+  .card{
+    display: flex;
+    flex-direction: column;
+    min-height: calc(100vh - 120px);
+  }
+
+
+  .form{
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+  }
+
+  </style>
+
+</head>
+
+<body>
+  <div class="page">
+    <div class="card">
+      <img class="page-logo" src="{{ url_for('static', filename='images/flytau.png') }}" alt="FlyTAU logo">
+
+
+        <h1>Build crew</h1>
+        <p class="motto">Assign pilots and attendants for Flight {{ flight_num }}</p>
+
+
+      <div class="subtitle">
+        Airplane {{ airplane_id }} ({{ plane_size }}) · {{ origin }} → {{ destination }}<br>
+        {{ departure_datetime }} → {{ arrival_datetime }}
+      </div>
+
+      <div class="req-box">
+        <div>
+          Required: <b>{{ need_pilots }}</b> pilots + <b>{{ need_attendants }}</b> attendants
+        </div>
+        {% if long_flag %}
+          <span class="tag">Long flight: long-approved only</span>
+        {% endif %}
+      </div>
+
+      {% if error %}
+        <div class="error" style="margin-top:14px;">{{ error }}</div>
+      {% endif %}
+
+      <form class="form" method="post" action="{{ url_for('create_flight_final') }}">
+        <input type="hidden" name="flight_num" value="{{ flight_num }}">
+        <input type="hidden" name="origin" value="{{ origin }}">
+        <input type="hidden" name="destination" value="{{ destination }}">
+        <input type="hidden" name="status" value="{{ status }}">
+        <input type="hidden" name="departure_datetime" value="{{ departure_datetime }}">
+        <input type="hidden" name="arrival_datetime" value="{{ arrival_datetime }}">
+        <input type="hidden" name="airplane_id" value="{{ airplane_id }}">
+        <input type="hidden" name="need_pilots" value="{{ need_pilots }}">
+        <input type="hidden" name="need_attendants" value="{{ need_attendants }}">
+
+        <div class="crew-grid">
+
+
+  <div class="crew-card">
+    <h2>Pilots</h2>
+
+    <div class="crew-list">
+      {% for p in pilots %}
+        <label class="crew-row">
+          <div class="crew-left">
+            <input type="checkbox" name="pilot_ids" value="{{ p[0] }}">
+            <span class="tick" aria-hidden="true"></span>
+
+            <div class="crew-text">
+              <p class="crew-name">{{ p[1] }} {{ p[2] }}</p>
+              <p class="crew-id">ID: {{ p[0] }}</p>
+            </div>
+          </div>
+
+          <span class="badge">Pilot</span>
+        </label>
+      {% endfor %}
+
+      {% if pilots|length == 0 %}
+        <div class="muted">No available pilots</div>
+      {% endif %}
+    </div>
+  </div>
+
+
+  <div class="crew-card">
+    <h2>Flight attendants</h2>
+
+    <div class="crew-list">
+      {% for a in attendants %}
+        <label class="crew-row">
+          <div class="crew-left">
+            <input type="checkbox" name="attendant_ids" value="{{ a[0] }}">
+            <span class="tick" aria-hidden="true"></span>
+
+            <div class="crew-text">
+              <p class="crew-name">{{ a[1] }} {{ a[2] }}</p>
+              <p class="crew-id">ID: {{ a[0] }}</p>
+            </div>
+          </div>
+
+          <span class="badge">Attendant</span>
+        </label>
+      {% endfor %}
+
+      {% if attendants|length == 0 %}
+        <div class="muted">No available attendants</div>
+      {% endif %}
+    </div>
+  </div>
+
+</div>
+
+
+        <div class="form-actions">
+          <a class="btn btn-secondary" href="{{ url_for('manager_home') }}" style="height: 48px;">← Back</a>
+          <button class="btn btn-primary" type="submit" style="height: 48px;">Continue to pricing</button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</body>
+</html>

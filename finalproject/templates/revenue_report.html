@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>FLYTAU - Revenue Report</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/flytau.png') }}?v=2">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background: linear-gradient(135deg, #E0F2FE 0%, #F0F9FF 100%);
+            padding: 20px;
+            margin: 0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .page-logo{
+          position: absolute;
+          top: 24px;
+          right: 24px;
+          width: 90px;
+          height: auto;
+          padding: 10px;
+          background: rgba(255,255,255,0.95);
+          border-radius: 14px;
+          box-shadow: 0 4px 16px rgba(0, 82, 204, 0.2);
+        }
+
+        h1 {
+            color: #0052CC;
+            margin-bottom: 10px;
+            font-size: 32px;
+            padding-right: 200px;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        .metric {
+            background: linear-gradient(135deg, #2563EB 0%, #0052CC 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .metric .value {
+            font-size: 48px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        .metric .label {
+            font-size: 14px;
+            opacity: 0.9;
+            text-transform: uppercase;
+        }
+        .chart-container {
+            height: 400px;
+            margin: 30px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 30px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #E5E7EB;
+        }
+        th {
+            background: #0052CC;
+            color: white;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 14px;
+        }
+        tr:nth-child(even) {
+            background: #F9FAFB;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: #0052CC;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+        }
+        .back-link:hover {
+            background: #003D99;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img class="page-logo" src="{{ url_for('static', filename='images/flytau.png') }}" alt="FLYTAU">
+        <h1>💰 Revenue by Aircraft Type and Class</h1>
+        <div class="subtitle">
+            <strong>What This Shows:</strong> Total revenue generated across your fleet, broken down by aircraft manufacturer, size, and cabin class (Economy vs Business).<br>
+            <strong>Key Insights:</strong> Identify which aircraft configurations are most profitable, compare Business vs Economy performance, and spot underperforming assets.<br>
+            <strong>Use For:</strong> Fleet expansion decisions, pricing strategy optimization, and investment prioritization.<br>
+            <strong>Action Items:</strong> Consider increasing capacity on high-revenue routes, evaluate Business class pricing on profitable aircraft, phase out low-performing configurations.<br>
+            <strong>Bottom Line:</strong> This data drives strategic decisions on where to invest in your fleet and how to maximize revenue per aircraft.
+        </p>
+
+        <div class="metric">
+            <div class="label">Total Revenue</div>
+            <div class="value">${{ "{:,.2f}".format(total_revenue) }}</div>
+        </div>
+
+        <div class="chart-container">
+            <canvas id="revenueChart"></canvas>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Manufacturer</th>
+                    <th>Plane Size</th>
+                    <th>Class</th>
+                    <th>Revenue</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in data %}
+                <tr>
+                    <td>{{ row.manufacturer }}</td>
+                    <td>{{ row.plane_size }}</td>
+                    <td>{{ row.class_type }}</td>
+                    <td>${{ "{:,.2f}".format(row.income) }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <a href="{{ url_for('home') }}" class="back-link">← Back to Home</a>
+    </div>
+
+    <script>
+        const ctx = document.getElementById('revenueChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: {{ labels|tojson }},
+                datasets: [{
+                    label: 'Economy',
+                    data: {{ economy_data|tojson }},
+                    backgroundColor: '#0052CC',
+                    borderRadius: 8
+                }, {
+                    label: 'Business',
+                    data: {{ business_data|tojson }},
+                    backgroundColor: '#60A5FA',
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Revenue Breakdown by Aircraft Type and Class',
+                        font: { size: 18, weight: 'bold' }
+                    },
+                    legend: {
+                        position: 'top'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '$' + value.toLocaleString();
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+    </div>
+</body>
+</html>

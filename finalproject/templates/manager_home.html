@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>FlyTAU – Manager Dashboard</title>
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/flytau.png') }}">
+
+  <style>
+
+
+
+    .table-wrap { width: 100%; overflow-x: auto; }
+    .table { width: 100%; min-width: 980px; }
+
+
+    .actions-cell { text-align: center; white-space: nowrap; }
+  </style>
+</head>
+
+<body class="dashboard">
+
+  <div class="page">
+    <div class="card">
+        <img class="page-logo" src="{{ url_for('static', filename='images/flytau.png') }}" alt="FlyTAU logo">
+
+        <h1>Manager Dashboard</h1>
+        <p class="motto">Manage flights and schedules</p>
+
+
+
+      <form class="form" method="get">
+        <div class="field">
+          <label for="status">Filter by status</label>
+          <select name="status" id="status">
+            <option value="">All</option>
+            {% for s in statuses %}
+              <option value="{{ s }}" {% if s == selected_status %}selected{% endif %}>
+                {{ s }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+        <div style="text-align:left; margin-top:16px">
+        <button class="btn btn-primary" type="submit">Filter</button>
+        </div>
+      </form>
+
+      <br>
+
+      <div style="display:flex; flex-direction:column; gap:14px; margin:18px 0;">
+      <a href="{{ url_for('add_flight') }}">
+        <button class="btn btn-primary">➕ Add new flight</button>
+      </a>
+
+      <a href="{{ url_for('add_worker') }}">
+        <button class="btn btn-primary">➕ Add new worker</button>
+      </a>
+
+      <a href="{{ url_for('add_airplane') }}">
+        <button class="btn btn-primary">➕ Add new airplane</button>
+      </a>
+      </div>
+
+
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Flight #</th>
+              <th>Route</th>
+              <th>Departure</th>
+              <th>Arrival</th>
+              <th>Status</th>
+              <th>Airplane</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {% for f in flights %}
+            <tr>
+              <td>{{ f[0] }}</td>
+              <td>{{ f[1] }} → {{ f[2] }}</td>
+              <td>{{ f[3] }}</td>
+              <td>{{ f[4] }}</td>
+              <td class="actions-cell">
+              {% set st_raw = f[5] or '' %}
+              {% set st = st_raw | trim | lower %}
+
+              {% if st not in ('cancelled','landed') %}
+                <form method="post"
+                  action="{{ url_for('update_flight_status', flight_num=f[0]) }}"
+                  style="display:inline-flex; gap:10px; align-items:center;">
+
+                  <select name="status" class="input" style="min-width:140px;">
+                    {% for s in statuses %}
+                      {% if s|lower != 'cancelled' %}
+                        <option value="{{ s }}" {% if (s|lower) == st %}selected{% endif %}>{{ s }}</option>
+                      {% endif %}
+                    {% endfor %}
+                  </select>
+
+                  <button class="btn btn-primary" type="submit">Update</button>
+                </form>
+              {% else %}
+                <input class="input"
+                   style="max-width:230px;"
+                   value="{{ st_raw }}"
+                   readonly
+                   tabindex="-1">
+              {% endif %}
+              </td>
+              <td>{{ f[6] }}</td>
+              <td class="actions-cell">
+                {% if f[5] not in ('cancelled','landed') and can_cancel.get(f[0]) %}
+                  <a class="btn btn-primary" href="{{ url_for('cancel_flight_confirm', flight_num=f[0]) }}">
+                    Cancel
+                  </a>
+                {% else %}
+                  -
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+
+            {% if flights|length == 0 %}
+            <tr>
+              <td colspan="7" class="muted">No flights found</td>
+            </tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="footer">
+        <a href="{{ url_for('home') }}">← Back To Home</a>
+      </div>
+
+    </div>
+  </div>
+</body>
+</html>

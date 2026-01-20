@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>FlyTAU – Add Worker</title>
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/flytau.png') }}">
+</head>
+
+<body>
+  <div class="page">
+    <div class="card">
+        <img class="page-logo" src="{{ url_for('static', filename='images/flytau.png') }}" alt="FlyTAU logo">
+
+        <h1>Add new worker</h1>
+
+      <form class="form" method="post" action="{{ url_for('add_worker') }}">
+
+        <div class="field">
+         <label>Role</label>
+        <label class="pretty-radio">
+          <input type="radio" name="role" value="pilot" required>
+          <span class="dot" aria-hidden="true"></span>
+          <span>Pilot</span>
+        </label>
+        <label class="pretty-radio">
+          <input type="radio" name="role" value="flight_attendant" required>
+          <span class="dot" aria-hidden="true"></span>
+          <span>Flight Attendant</span>
+        </label>
+        </div>
+
+        <div class="field">
+          <label for="worker_id">Worker ID</label>
+          <input type="text" id="worker_id" name="worker_id" required>
+        </div>
+
+        <div class="field">
+          <label for="phone_number">Phone number</label>
+          <input type="text" id="phone_number" name="phone_number" required>
+        </div>
+
+        <div class="field">
+          <label for="house_num">House number</label>
+          <input type="number" id="house_num" name="house_num" required>
+        </div>
+
+        <div class="field">
+          <label for="street">Street</label>
+          <input id="street" name="street" required>
+        </div>
+
+          <div class="field">
+          <label for="city">City</label>
+          <input id="city" name="city" required>
+        </div>
+
+          <div class="field">
+          <label for="f_name_he">First name (HE)</label>
+          <input id="f_name_he" name="f_name_he" required>
+        </div>
+
+          <div class="field">
+          <label for="l_name_he">Last name (HE)</label>
+          <input id="l_name_he" name="l_name_he" required>
+        </div>
+
+          <div class="field">
+          <label for="work_start_date">Work start date</label>
+          <input type="date" id="work_start_date" name="work_start_date" required>
+        </div>
+        <div class="field">
+        <label>Approved for long flights</label>
+
+        <label class="pretty-radio">
+          <input type="radio" name="lng_flight_approved" value="1" required>
+          <span class="dot" aria-hidden="true"></span>
+          <span>Yes</span>
+        </label>
+
+        <label class="pretty-radio">
+          <input type="radio" name="lng_flight_approved" value="1" required>
+          <span class="dot" aria-hidden="true"></span>
+          <span>No</span>
+        </label>
+        </div>
+
+        <button class="btn btn-primary" type="submit">Add to system</button>
+        {% if error %}
+          <div class="error">{{ error }}</div>
+        {% endif %}
+
+      </form>
+
+      <div class="footer">
+        <a href="{{ url_for('manager_home') }}">← Back to dashboard</a>
+      </div>
+
+    </div>
+  </div>
+</body>
+</html>

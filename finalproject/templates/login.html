@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>FlyTAU - Login</title>
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/flytau.png') }}?v=2">
+</head>
+
+<body>
+  <div class="page">
+    <div class="card">
+        <img class="page-logo" src="{{ url_for('static', filename='images/flytau.png') }}" alt="FlyTAU logo">
+
+        <h1>FlyTAU</h1>
+        <p class="subtitle">
+          Log in to continue<br>
+        </p>
+
+      <form class="form" action="{{ url_for('login') }}" method="post">
+
+        <div class="field">
+          <div style="display:flex; gap:18px; align-items:center; flex-wrap:wrap; margin-top:6px;">
+            <label class="pretty-radio">
+            <input type="radio" name="login_type" value="customer" required>
+                <span class="dot" aria-hidden="true"></span>
+                <span>Customer</span>
+            </label>
+
+            <label class="pretty-radio">
+              <input type="radio" name="login_type" value="manager" required>
+                <span class="dot" aria-hidden="true"></span>
+              <span>Manager</span>
+            </label>
+
+          </div>
+        </div>
+
+
+        <div class="field">
+          <label for="email">Username</label>
+          <input
+            id="email"
+            type="text"
+            name="email"
+            placeholder="Email / Worker ID"
+            value="{{ request.form.get('email', '') }}"
+            required
+          >
+        </div>
+
+
+        <div class="field">
+          <label for="password">Password</label>
+          <input
+            id="password"
+            type="password"
+            name="password"
+            placeholder="••••••••"
+            required
+          >
+        </div>
+
+
+        <button class="btn btn-primary" type="submit">
+          Log in
+        </button>
+
+        {% if error %}
+          <div class="error">{{ error }}</div>
+        {% endif %}
+      </form>
+
+
+          <div class="footer">
+          <span>Don't have an account?</span>
+          <a href="{{ url_for('signup') }}">Sign up here</a>
+          <br>
+          <a href="{{ url_for('home') }}">← Back to home</a>
+
+
+      </div>
+    </div>
+  </div>
+</body>
+</html>

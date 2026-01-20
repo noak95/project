@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>FlyTAU – Add Flight</title>
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/flytau.png') }}">
+</head>
+
+<body>
+  <div class="page">
+    <div class="card">
+        <img class="page-logo" src="{{ url_for('static', filename='images/flytau.png') }}" alt="FlyTAU logo">
+
+
+        <h1>Add new flight</h1>
+        <p class="subtitle">Create a flight</p>
+
+
+      <form class="form" method="post" action="{{ url_for('add_flight') }}">
+
+        <div class="field">
+          <label for="flight_num">Flight number</label>
+          <input
+            id="flight_num"
+            name="flight_num"
+            type="text"
+            value="{{ flight_num }}"
+            readonly
+            required
+          >
+        </div>
+
+        <div class="field">
+          <label for="origin">Origin airport</label>
+          <input id="origin" name="origin" placeholder="TLV" required>
+        </div>
+
+        <div class="field">
+          <label for="destination">Destination airport</label>
+          <input id="destination" name="destination" placeholder="ATH" required>
+        </div>
+
+        <div class="field">
+          <label for="departure_datetime">Departure time</label>
+          <input type="datetime-local" id="departure_datetime" name="departure_datetime" required>
+        </div>
+
+
+        <div class="field">
+          <label for="status">Flight status</label>
+          <select id="status" name="status">
+            <option value="active">active</option>
+            <option value="delayed">delayed</option>
+            <option value="cancelled">cancelled</option>
+            <option value="landed">landed</option>
+            <option value="fully booked">fully booked</option>
+          </select>
+        </div>
+
+        <button class="btn btn-primary" type="submit">Continue to choose airplane</button>
+      </form>
+      {% if error %}
+        <div class="error">{{ error }}</div>
+      {% endif %}
+
+      <div class="footer">
+        <a href="{{ url_for('manager_home') }}">← Back to dashboard</a>
+      </div>
+
+    </div>
+  </div>
+<script>
+  const dtInput = document.getElementById("departure_datetime");
+  if (dtInput) {
+    const now = new Date();
+
+    const yyyy = now.getFullYear();
+    const mm = String(now.getMonth() + 1).padStart(2, "0");
+    const dd = String(now.getDate()).padStart(2, "0");
+    const hh = String(now.getHours()).padStart(2, "0");
+    const mi = String(now.getMinutes()).padStart(2, "0");
+
+    // datetime-local expects: YYYY-MM-DDTHH:MM
+    dtInput.min = `${yyyy}-${mm}-${dd}T${hh}:${mi}`;
+  }
+</script>
+
+
+</body>
+</html>

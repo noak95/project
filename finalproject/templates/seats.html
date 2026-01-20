@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>FlyTAU - Choose Seats</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+
+  <style>
+
+    .page { width: 100%; display: flex; justify-content: center; }
+    .card {width: 100%; margin: 0 auto; }
+
+    .legend{
+      display:flex; gap:14px; align-items:center;
+      font-size:22px; color:#555; margin-top: 10px; justify-content:center;
+      flex-wrap: wrap;
+    }
+    .chip{ width:14px; height:14px; border-radius:5px; border:1px solid #dcdcdc; display:inline-block; }
+    .chip.free{ background:#fff; }
+    .chip.taken{ background:#f3f4f6; border-color:#e5e7eb; }
+    .chip.unavailable{ background:#fff7ed; border-color:#fed7aa; }
+
+    .section { margin-top: 18px; padding-top: 14px; border-top: 1px solid #e6e8f0; }
+    .section:first-child { border-top: none; margin-top: 0; padding-top: 0; }
+    .section h2 { margin: 0; font-size: 25px; }
+    .price { margin-top: 6px; color: #666; font-size: 17px; }
+
+    .seatmap { margin-top: 12px; overflow-x: auto; }
+    table { border-collapse: separate; border-spacing: 10px; margin: 0 auto; }
+    th { text-align:center; font-size:12px; color:#6b7280; font-weight:800; }
+    .rowlbl { width: 46px; text-align:center; padding-right: 8px; font-weight:900; color:#111827; }
+
+    .seat-check {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .seat-label {
+      width: 44px; height: 44px;
+      border-radius: 12px;
+      border: 1px solid #dcdcdc;
+      background: #fff;
+      font-weight: 900;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: box-shadow .15s ease, border-color .15s ease, transform .06s ease;
+      user-select: none;
+    }
+
+    .seat-label:hover {
+      border-color: #9aa7ff;
+      box-shadow: 0 0 0 4px rgba(154,167,255,0.25);
+    }
+
+    .seat-check:checked + .seat-label {
+      border-color: #2563EB;
+      box-shadow: 0 0 0 4px rgba(37,99,235,0.20);
+      transform: translateY(-1px);
+    }
+
+    .seat-disabled {
+      width: 44px; height: 44px;
+      border-radius: 12px;
+      border: 1px solid #e5e7eb;
+      background: #f3f4f6;
+      color: #9ca3af;
+      font-weight: 900;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: not-allowed;
+    }
+
+    .seat-unavailable {
+      width: 44px; height: 44px;
+      border-radius: 12px;
+      border: 1px solid #fed7aa;
+      background: #fff7ed;
+      color: #9a3412;
+      font-weight: 900;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: not-allowed;
+    }
+
+    .actions-footer{
+      display:flex;
+      justify-content: space-between;
+      align-items:center;
+      gap: 12px;
+      margin-top: 22px;
+    }
+
+    .actions-footer a.btn { width: auto; }
+    .actions-footer .btn { width: auto; min-width: 180px; }
+
+    .footer {font-size:17px;
+    }
+
+
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <div class="card">
+        <img class="page-logo" src="{{ url_for('static', filename='images/flytau.png') }}" alt="FlyTAU logo">
+
+
+        <h1>Choose seats</h1>
+        <p class="subtitle">Flight {{ flight_num }} · Choose exactly {{ passengers }} seat(s)</p>
+
+        {% if error %}
+          <div class="error" style="margin-top:12px;">{{ error }}</div>
+        {% endif %}
+
+
+      <div class="legend">
+        <span><span class="chip free"></span> Available</span>
+        <span><span class="chip taken"></span> Taken</span>
+      </div>
+
+      <form method="post" action="{{ url_for('seats_page', flight_num=flight_num, passengers=passengers) }}">
+        {% for class_type, info in classes %}
+          <div class="section">
+            <h2>{{ class_type }}</h2>
+            <div class="price">
+              Price per seat:
+              {% if info.price is not none %}
+                {{ "%.2f"|format(info.price) }}
+              {% else %}
+                TBD
+              {% endif %}
+            </div>
+
+            <div class="seatmap">
+            {% set n = info.cols|length %}
+            {% if n == 4 %}
+              {% set split = [2] %}          {# 2|2 #}
+            {% elif n == 6 %}
+              {% set split = [3] %}          {# 3|3 #}
+            {% elif n == 9 %}
+              {% set split = [3, 6] %}       {# 3|3|3 #}
+            {% elif n == 10 %}
+              {% set split = [3, 7] %}       {# 3|4|3 #}
+            {% else %}
+              {% set split = [n//2] %}       {# fallback באמצע #}
+            {% endif %}
+
+            <table>
+              <thead>
+                <tr>
+                  <th></th>
+                  {% for c in info.cols %}
+                    <th>{{ c }}</th>
+                    {% if loop.index in split %}
+                      <th class="aisle-col"></th>
+                    {% endif %}
+                  {% endfor %}
+                </tr>
+              </thead>
+
+              <tbody>
+                {% for r in info.rows %}
+                  <tr>
+                    <td class="rowlbl">{{ r }}</td>
+
+                    {% for c in info.cols %}
+                      {% set seat = info.grid.get(r, {}).get(c) %}
+                      <td style="text-align:center;">
+                        {% if seat %}
+                          {% if seat.status == 'TAKEN' %}
+                            <span class="seat-disabled">{{ c }}</span>
+                          {% elif seat.status == 'UNAVAILABLE' %}
+                            <span class="seat-unavailable">{{ c }}</span>
+                          {% else %}
+                            {% set seat_id = "seat_" ~ class_type ~ "_" ~ r ~ "_" ~ c %}
+                            <input class="seat-check" type="checkbox" id="{{ seat_id }}" name="seats"
+                                   value="{{ class_type }}|{{ r }}|{{ c }}">
+                            <label class="seat-label" for="{{ seat_id }}">{{ c }}</label>
+                          {% endif %}
+                        {% else %}
+                          <span style="display:inline-block;width:44px;height:44px;"></span>
+                        {% endif %}
+                      </td>
+
+                      {% if loop.index in split %}
+                        <td class="aisle-col"></td>
+                      {% endif %}
+                    {% endfor %}
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+
+            </div>
+          </div>
+        {% endfor %}
+
+        <div class="actions-footer">
+          <a class="btn btn-secondary" href="{{ url_for('home') }}">Back to search</a>
+          <button class="btn btn-primary" type="submit">Continue</button>
+        </div>
+      </form>
+
+      <div class="footer">
+        <small>You must select exactly {{ passengers }} seat(s). If not, we’ll show an error.</small>
+      </div>
+
+    </div>
+  </div>
+</body>
+</html>

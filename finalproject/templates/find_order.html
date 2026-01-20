@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>FlyTAU - Find Order</title>
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/flytau.png') }}?v=2">
+  <style>
+  .actions-cell { text-align: center; white-space: nowrap; }
+  </style>
+
+</head>
+
+<body>
+  <div class="page">
+    <div class="card">
+        <img class="page-logo" src="{{ url_for('static', filename='images/flytau.png') }}" alt="FlyTAU logo">
+
+
+        <h1>Find Order</h1>
+        <p class="subtitle">Search by email and order number</p>
+
+
+      <form class="form" method="post">
+        <div class="field">
+          <label for="email">Email</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            placeholder="example@email.com"
+            required
+            value="{{ email or '' }}"
+          >
+        </div>
+
+        <div class="field">
+          <label for="order_id">Order ID</label>
+          <input
+            type="text"
+            id="order_id"
+            name="order_id"
+            inputmode="numeric"
+            required
+            value="{{ order_id or '' }}"
+          >
+        </div>
+
+        <button class="btn btn-primary" type="submit">Find Order</button>
+      </form>
+
+      {% if error %}
+        <div class="error" style="background:#f8f9ff; border-color:#e6e8f0; color:#111827;">
+          {{ error }}
+        </div>
+      {% endif %}
+
+      {% if rows and rows|length > 0 %}
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Order #</th>
+                <th>Order Date</th>
+                <th>Flight</th>
+                <th>Route</th>
+                <th>Departure</th>
+                <th>Arrival</th>
+                <th>Seats</th>
+                <th>Order Status</th>
+                <th>Total Paid</th>
+                <th>Cancellation Fee</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {% for r in rows %}
+              <tr>
+
+                <td>{{ r[0] }}</td>
+                <td>{{ r[1] }}</td>
+                <td>{{ r[5] }}</td>
+                <td>{{ r[6] }} → {{ r[7] }}</td>
+                <td>{{ r[8] }}</td>
+                <td>{{ r[9] }}</td>
+                <td>{{ r[11] }}</td>
+                <td>{{ r[2] }}</td>
+                <td>{{ r[3] }}</td>
+                <td>{{ r[4] }}</td>
+                <td class="actions-cell">
+                {% if can_cancel.get(r[0]) %}
+                  <a class="btn btn-primary"
+                  href="{{ url_for('cancel_order_confirm', order_id=order_id, email=email) }}">
+                  Cancel
+                  </a>
+
+                {% else %}
+                  -
+                {% endif %}
+                </td>
+
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% endif %}
+
+      <div class="footer">
+        <a href="{{ url_for('home') }}">← Back to search</a>
+      </div>
+
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>FlyTAU - Cancel Order</title>
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/flytau.png') }}?v=2">
+
+  <style>
+    .actions-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 18px; }
+    .warn-box { background: #fff7ed; border: 1px solid #fed7aa; color: #9a3412; padding: 12px 14px; border-radius: 10px; }
+    .muted { opacity: 0.8; }
+  </style>
+</head>
+
+<body class="dashboard">
+  <div class="page">
+    <div class="card">
+      <img class="page-logo" src="{{ url_for('static', filename='images/flytau.png') }}" alt="FlyTAU logo">
+
+
+        <h1>Cancel Order</h1>
+        <p class="motto">Please confirm your cancellation</p>
+
+        <div class="warn-box">
+          <strong>Are you sure?</strong>
+          <div class="muted" style="margin-top:6px;">
+            This will cancel your entire order, you will pay 5% cancellation fee.
+          </div>
+        </div>
+
+        <div style="margin-top:16px;">
+          <p><strong>Order #:</strong> {{ row[0] }}</p>
+          <p><strong>Status:</strong> {{ row[2] }}</p>
+          <p><strong>Flight #:</strong> {{ row[5] }}</p>
+          <p><strong>Route:</strong> {{ row[6] }} → {{ row[7] }}</p>
+          <p><strong>Departure:</strong> {{ row[8] }}</p>
+        </div>
+
+        <div class="actions-row">
+
+        <form method="post" action="{{ url_for('cancel_order_confirm', order_id=row[0], email=guest_email) }}">
+        <input type="hidden" name="email" value="{{ guest_email }}">
+        <button class="btn btn-primary" type="submit">Confirm Cancel</button>
+        </form>
+
+        </div>
+
+
+      <div class="footer">
+        {% if redirect_to == "home" %}
+          <a href="{{ url_for('home') }}">← Back to Home</a>
+        {% else %}
+          <a href="{{ url_for('my_orders') }}">← Back to My Orders</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</body>
+</html>

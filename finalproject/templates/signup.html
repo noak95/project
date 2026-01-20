@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>FlyTAU - Sign up</title>
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/flytau.png') }}?v=2">
+</head>
+
+<body>
+  <div class="page">
+    <div class="card">
+
+        <img class="page-logo" src="{{ url_for('static', filename='images/flytau.png') }}" alt="FlyTAU logo">
+        <h1>Create account</h1>
+        <p class="subtitle">Sign up to book flights</p>
+
+
+      <form class="form" method="POST" action="{{ url_for('signup') }}">
+        <div class="field">
+          <label for="f_name_eng">First name (English)</label>
+          <input id="f_name_eng" name="f_name_eng" type="text" placeholder="e.g., Noa" required>
+        </div>
+
+        <div class="field">
+          <label for="l_name_eng">Last name (English)</label>
+          <input id="l_name_eng" name="l_name_eng" type="text" placeholder="e.g., Klein" required>
+        </div>
+
+        <div class="field">
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" placeholder="name@example.com" required>
+        </div>
+
+        <div class="field">
+          <label for="phone1">Phone number</label>
+          <input id="phone1" name="phone1" type="text" placeholder="e.g., 0520000001" required>
+        </div>
+
+        <div class="field">
+          <label for="phone2">Additional phone (optional)</label>
+          <input id="phone2" name="phone2" type="text" placeholder="e.g., 0520000002">
+        </div>
+
+        <div class="field">
+          <label for="passport_num">Passport number</label>
+          <input id="passport_num" name="passport_num" type="text" placeholder="e.g., A12345678" required>
+        </div>
+
+        <div class="field">
+          <label for="birth_date">Birth date</label>
+          <input id="birth_date" name="birth_date" type="date" required>
+        </div>
+
+        <div class="field">
+          <label for="password">Password</label>
+          <input id="password" name="password" type="password" required>
+        </div>
+
+        <button class="btn btn-primary" type="submit">Sign up</button>
+
+        {% if error %}
+          <div class="error">{{ error }}</div>
+        {% endif %}
+
+        {% if success %}
+          <div class="success">{{ success }}</div>
+        {% endif %}
+      </form>
+
+      <div class="footer">
+        Already have an account?
+        <a href="{{ url_for('login') }}">Log in</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

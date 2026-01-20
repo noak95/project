@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>FlyTAU - Order Summary</title>
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/flytau.png') }}?v=2">
+<style>
+    .form {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .field.span-2 { grid-column: 1 / -1; }
+
+    .readonly-pill{
+      background: #f8f9ff;
+      border-color: #e6e8f0;
+      color: #111827;
+      font-weight: 600;
+    }
+
+    .actions-row{
+      grid-column: 1 / -1;
+      margin-top: 18px;
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      align-items: center;
+    }
+
+    .actions-row .btn{
+      width: 240px;
+      height: 50px;
+      max-width: 100%;
+      justify-content: center;
+    }
+
+
+    @media (max-width: 700px){
+      .form{ grid-template-columns: 1fr; }
+      .actions-row{ grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <div class="card">
+        <img class="page-logo" src="{{ url_for('static', filename='images/flytau.png') }}" alt="FlyTAU logo">
+
+
+        <h1>Order Summary</h1>
+        <p class="subtitle">Please confirm your booking</p>
+
+
+      {% if error %}
+        <div class="error" style="background:#f8f9ff; border-color:#e6e8f0; color:#111827;">
+          {{ error }}
+        </div>
+      {% endif %}
+
+      <div class="form">
+        <div class="field">
+          <label>Flight Number</label>
+          <input type="text" value="{{ flight_num }}" readonly>
+        </div>
+
+        <div class="field span-2">
+          <label>Selected Seats</label>
+          <input
+            type="text"
+            class="readonly-pill"
+            value="{{ selected_seats | join(', ') if selected_seats is iterable and selected_seats is not string else selected_seats }}"
+            readonly
+          >
+        </div>
+
+      </div>
+
+      <form class="form" method="post" action="{{ url_for('order_summary') }}">
+        <input type="hidden" name="flight_num" value="{{ flight_num }}">
+
+        {% if selected_seats is iterable and selected_seats is not string %}
+          {% for s in selected_seats %}
+            <input type="hidden" name="selected_seats" value="{{ s }}">
+          {% endfor %}
+        {% else %}
+          <input type="hidden" name="selected_seats" value="{{ selected_seats }}">
+        {% endif %}
+      </form>
+        <div style="display:flex; justify-content:center; gap:10px; align-items:center; margin-top:12px;">
+          <a class="btn btn-secondary"
+             href="{{ url_for('seats_page', flight_num=flight_num, passengers=selected_seats|length) }}" style="width: auto;height: 48px;">
+            ← Back
+          </a>
+
+          <button class="btn btn-primary" type="submit" style="width:auto;">Confirm Order</button>
+        </div>
+
+
+      <div class="footer">
+        <a href="{{ url_for('home') }}">← Back to search</a>
+      </div>
+
+    </div>
+  </div>
+</body>
+</html>

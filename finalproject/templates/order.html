@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FlyTAU - Select flight time</title>
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/flytau.png') }}?v=2">
+
+  <style>
+
+
+    .grid{
+      display: grid;
+      grid-template-columns: 1.4fr 0.8fr;
+      gap: 18px;
+      margin-top: 16px;
+    }
+
+    .summary{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+      padding: 14px 16px;
+      border: 1px solid #e6e8f0;
+      border-radius: 16px;
+      background: #f8f9ff;
+    }
+    .summary .route{ font-weight: 900; font-size: 18px; color:#111827; }
+    .summary .meta{ font-size: 13px; color:#6b7280; margin-top: 2px; }
+    .summary .pill{
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid #e6e8f0;
+      background: #fff;
+      font-weight: 800;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .options{ display: grid; gap: 12px; margin-top: 14px; }
+
+    .flight-option{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 14px;
+      padding: 14px 16px;
+      border: 1px solid #e6e8f0;
+      border-radius: 16px;
+      background: #fff;
+      cursor: pointer;
+      transition: box-shadow .15s ease, border-color .15s ease, transform .06s ease;
+    }
+    .flight-option:hover{
+      border-color: rgba(37,99,235,0.35);
+      box-shadow: 0 12px 26px rgba(37,99,235,0.10);
+      transform: translateY(-1px);
+    }
+
+    .flight-left{ display:flex; align-items:center; gap: 12px; min-width: 0; }
+    .flight-left input{ transform: scale(1.1); }
+
+    .flight-meta{ min-width: 0; }
+    .flight-meta .fn{ margin:0; font-weight: 900; font-size: 15px; color:#111827; }
+    .flight-meta .sub{ margin:2px 0 0 0; font-size: 12px; color:#6b7280; }
+
+    .times{ display:flex; gap: 12px; align-items:center; }
+    .timebox{
+      min-width: 170px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid #e6e8f0;
+      background: #fafbff;
+      text-align: left;
+    }
+    .timebox .lbl{ display:block; font-size: 11px; color:#6b7280; margin-bottom: 2px; }
+    .timebox .val{ font-weight: 900; font-size: 18px; color:#111827; letter-spacing: .3px; }
+
+
+    .actions{
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+     }
+    .actions .btn{ width:100%; min-width:0; }
+
+    .side-card h2{ margin:0; font-size: 18px; font-weight: 900; }
+    .side-card .divider{ height:1px; background:#e6e8f0; margin: 12px 0; }
+    .side-card .line{
+      display:flex;
+      justify-content:space-between;
+      padding: 10px 0;
+      font-size: 14px;
+      color:#111827;
+    }
+    .side-card .muted{ color:#6b7280; }
+    .side-card .hint{ font-size: 12px; color:#6b7280; line-height: 1.4; }
+
+
+    .timebox .val{
+      font-size: 16px;
+      letter-spacing: 0;
+      white-space: nowrap;
+    }
+    .timebox{
+      min-width: 0;
+    }
+    .times{
+      gap: 12px;
+    }
+    .flight-radio{
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .flight-option{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 14px;
+      padding: 14px 16px;
+      border: 1px solid #e6e8f0;
+      border-radius: 16px;
+      background: #fff;
+      cursor: pointer;
+      transition: box-shadow .15s ease, border-color .15s ease, transform .06s ease, background .15s ease;
+    }
+
+    .flight-option:hover{
+      border-color: rgba(37,99,235,0.35);
+      box-shadow: 0 12px 26px rgba(37,99,235,0.10);
+      transform: translateY(-1px);
+    }
+
+    .flight-radio:checked + .flight-option{
+      border-color: #2563EB;
+      background: rgba(37,99,235,0.06);
+      box-shadow: 0 0 0 4px rgba(37,99,235,0.12);
+    }
+
+    .left{ display:flex; align-items:center; gap: 12px; min-width: 0; }
+
+    .dot{
+      width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      border: 2px solid #cbd5e1;
+      display: inline-block;
+      position: relative;
+      flex: 0 0 auto;
+    }
+    .flight-radio:checked + .flight-option .dot{
+      border-color: #2563EB;
+    }
+    .flight-radio:checked + .flight-option .dot::after{
+      content:"";
+      position:absolute;
+      inset: 4px;
+      border-radius: 999px;
+      background: #2563EB;
+    }
+
+
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <div class="card">
+      <img class="page-logo" src="{{ url_for('static', filename='images/flytau.png') }}" alt="FlyTAU logo">
+
+
+        <h1>Select flight time</h1>
+        <p class="subtitle">Choose a time to continue to seat selection</p>
+
+
+      <div class="grid">
+
+        <div>
+          <div class="summary">
+            <div>
+              <div class="route">{{ origin }} → {{ destination }}</div>
+              <div class="meta">{{ date }} · {{ passengers }} passenger(s)</div>
+            </div>
+            <div class="pill">Step 1 / 3</div>
+          </div>
+
+          {% if options %}
+            <form action="{{ url_for('order_page', passengers=passengers) }}" method="post">
+              <div class="options">
+                {% for row in options %}
+                  <input class="flight-radio" type="radio" name="flight_num" id="f_{{ row[0] }}" value="{{ row[0] }}" required>
+
+                  <label class="flight-option" for="f_{{ row[0] }}">
+                    <div class="left">
+                      <span class="dot" aria-hidden="true"></span>
+
+                      <div class="flightmeta">
+                        <p class="fn">Flight {{ row[0] }}</p>
+                        <p class="sub">Select this time</p>
+                      </div>
+                    </div>
+
+                    <div class="times">
+                      <div class="timebox">
+                        <span class="lbl">Departure</span>
+                        <span class="val">{{ row[1] }}</span>
+                      </div>
+                      <div class="timebox">
+                        <span class="lbl">Arrival</span>
+                        <span class="val">{{ row[2] }}</span>
+                      </div>
+                    </div>
+                  </label>
+
+                {% endfor %}
+              </div>
+
+              <div class="actions">
+                <button class="btn btn-primary" type="submit">Continue</button>
+                <a class="btn btn-secondary" href="{{ url_for('home') }}">Back to search</a>
+              </div>
+            </form>
+          {% else %}
+            <div class="error" style="margin-top:14px;">{{error}}</div>
+            <div class="actions">
+              <a class="btn btn-secondary" href="{{ url_for('home') }}">Back to search</a>
+            </div>
+          {% endif %}
+        </div>
+
+
+        <div class="card side-card">
+          <h2>Trip summary</h2>
+          <div class="divider"></div>
+
+          <div class="line"><span class="muted">From</span><span>{{ origin }}</span></div>
+          <div class="line"><span class="muted">To</span><span>{{ destination }}</span></div>
+          <div class="line"><span class="muted">Date</span><span>{{ date }}</span></div>
+
+          <div class="divider"></div>
+          <div class="hint">
+            Select a flight time and click Continue to choose seats.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

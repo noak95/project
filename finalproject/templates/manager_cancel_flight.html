@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>FlyTAU – Cancel Flight</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/flytau.png') }}">
+</head>
+
+<body>
+  <div class="page">
+    <div class="card" >
+        <img class="page-logo" src="{{ url_for('static', filename='images/flytau.png') }}" alt="FlyTAU logo">
+
+
+        <h1>Cancel flight</h1>
+        <p class="subtitle">Please confirm</p>
+
+
+      {% if error %}
+        <div class="error">{{ error }}</div>
+      {% endif %}
+
+      <div class="results">
+        <table class="table">
+          <tr><th>Flight #</th><td>{{ flight_num }}</td></tr>
+          <tr><th>Route</th><td>{{ origin }} → {{ destination }}</td></tr>
+          <tr><th>Departure</th><td>{{ departure }}</td></tr>
+          <tr><th>Status</th><td>{{ status }}</td></tr>
+          <tr><th>Active orders to cancel</th><td>{{ active_orders_count }}</td></tr>
+        </table>
+      </div>
+
+      <form class="form" method="post" action="{{ url_for('cancel_flight_confirm', flight_num=flight_num) }}">
+        <button class="btn btn-primary" type="submit">Confirm cancel</button>
+        <a class="btn btn-secondary" href="{{ url_for('manager_home') }}">Back</a>
+      </form>
+
+    </div>
+  </div>
+</body>
+</html>

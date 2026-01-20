@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>FlyTAU – Choose Classes</title>
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/flytau.png') }}">
+</head>
+
+<body>
+  <div class="page">
+    <div class="card">
+        <img class="page-logo" src="{{ url_for('static', filename='images/flytau.png') }}" alt="FlyTAU logo">
+
+        <h1>Choose classes</h1>
+
+
+      <form class="form" method="post" action="{{ url_for('save_airplane') }}" autocomplete="off">
+
+
+  <input type="hidden" name="manufacturer" value="{{ manufacturer }}">
+  <input type="hidden" name="date" value="{{ date_of_purchase }}">
+  <input type="hidden" name="plane_size" value="{{ plane_size }}">
+
+
+  <div class="class-block">
+    <div class="class-title"><h2>Economy</h2></div>
+
+    <div class="fields-row">
+      <div class="field">
+        <label for="eco_rows">Rows (max 40)</label>
+        <input type="number" id="eco_rows" name="eco_rows" min="1" max="40" required autocomplete="off">
+      </div>
+
+      <div class="field">
+        <label for="eco_cols">Columns (max 10)</label>
+        <input type="number" id="eco_cols" name="eco_cols" min="1" max="10" required autocomplete="off">
+      </div>
+    </div>
+  </div>
+
+  {% if plane_size != "small" %}
+
+  <div class="class-block">
+    <div class="class-title"><h2>Business</h2></div>
+
+    <div class="fields-row">
+      <div class="field">
+        <label for="bus_rows">Rows (max 10)</label>
+        <input type="number" id="bus_rows" name="bus_rows" min="1" max="10" required autocomplete="off">
+      </div>
+
+      <div class="field">
+        <label for="bus_cols">Columns (max 6)</label>
+        <input type="number" id="bus_cols" name="bus_cols" min="1" max="6" required autocomplete="off">
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="actions">
+    <button class="btn btn-primary" type="submit">Save</button>
+  </div>
+</form>
+
+<script>
+
+  window.addEventListener("pageshow", function (event) {
+    if (event.persisted) {
+      const form = document.querySelector("form.form");
+      if (form) form.reset();
+    }
+  });
+</script>
+
+
+      <div class="footer">
+        <a href="{{ url_for('add_airplane') }}">← Back</a>
+      </div>
+
+    </div>
+  </div>
+</body>
+</html>

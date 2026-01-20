@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FLYTAU - Cancellation Rate Report</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/flytau.png') }}?v=2">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background: linear-gradient(135deg, #E0F2FE 0%, #F0F9FF 100%);
+            padding: 20px;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .logo {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            height: 60px;
+        }
+
+        .logo img {
+            height: 100%;
+            width: auto;
+        }
+
+        h1 {
+            color: #0052CC;
+            margin-bottom: 10px;
+            font-size: 32px;
+            padding-right: 200px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.8;
+            padding: 15px;
+            background: #F0F9FF;
+            border-radius: 8px;
+            border-left: 4px solid #0052CC;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .metric {
+            background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .metric .value {
+            font-size: 42px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .metric .label {
+            font-size: 14px;
+            opacity: 0.9;
+            text-transform: uppercase;
+        }
+
+        .chart-container {
+            height: 400px;
+            margin: 30px 0;
+            background: #F9FAFB;
+            padding: 20px;
+            border-radius: 12px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 30px;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #E5E7EB;
+        }
+
+        th {
+            background: #0052CC;
+            color: white;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 14px;
+        }
+
+        tr:nth-child(even) {
+            background: #F9FAFB;
+        }
+
+        tr:hover {
+            background: #E0F2FE;
+        }
+
+        .badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge.success {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .badge.warning {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .badge.danger {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+
+        .footer {
+            margin-top: 30px;
+            padding: 20px;
+            background: #F0F9FF;
+            border-radius: 8px;
+            text-align: center;
+            color: #666;
+        }
+        .page-logo{
+              position: absolute;
+              top: 24px;
+              right: 24px;
+              width: 90px;
+              height: auto;
+              padding: 10px;
+              background: rgba(255,255,255,0.95);
+              border-radius: 14px;
+              box-shadow: 0 4px 16px rgba(0, 82, 204, 0.2);
+            }
+            .back-link {
+                display: inline-block;
+                margin-top: 20px;
+                padding: 10px 20px;
+                background: #0052CC;
+                color: white;
+                text-decoration: none;
+                border-radius: 8px;
+            }
+            .back-link:hover {
+                background: #003D99;
+            }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <img class=page-logo src="{{ url_for('static', filename='images/flytau.png') }}" alt="FLYTAU">
+        <h1>📊 Monthly Cancellation Rate Report</h1>
+
+        <div class="subtitle">
+            <strong>What This Shows:</strong> Percentage of orders cancelled each month, identifying trends and operational issues.<br>
+            <strong>Key Insights:</strong> Cancellation rates above 5% indicate problems requiring investigation. Rising trends suggest customer dissatisfaction.<br>
+            <strong>Use For:</strong> Risk management, capacity planning, customer service improvement, and cancellation policy adjustments.<br>
+            <strong>Action Items:</strong> Investigate months with unusual rates, address common cancellation reasons, consider adjusting fees.<br>
+            <strong>Bottom Line:</strong> Tracking cancellations helps prevent revenue loss and improve customer experience.
+        </div>
+
+        <div class="metrics-grid">
+            <div class="metric">
+                <div class="label">Average Rate</div>
+                <div class="value">{{ avg_rate }}%</div>
+            </div>
+            <div class="metric">
+                <div class="label">Highest Month</div>
+                <div class="value">{{ max_rate }}%</div>
+            </div>
+            <div class="metric">
+                <div class="label">Lowest Month</div>
+                <div class="value">{{ min_rate }}%</div>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <canvas id="cancellationChart"></canvas>
+        </div>
+
+        <h2 style="color: #0052CC; margin-top: 40px;">Monthly Data</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Month</th>
+                    <th>Cancellation Rate</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in results %}
+                <tr>
+                    <td>{{ row[0] }}</td>
+                    <td>{{ row[1] }}%</td>
+                    <td>
+                        {% if row[1]|float < 3 %}
+                            <span class="badge success">✓ Excellent</span>
+                        {% elif row[1]|float < 5 %}
+                            <span class="badge success">✓ Good</span>
+                        {% else %}
+                            <span class="badge warning">⚠ Needs Attention</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="footer">
+            <strong>💡 Business Insights:</strong><br>
+            • Rates >5% indicate operational/service issues • Holiday months often show spikes<br>
+            • Each 1% cancellation ≈ 50,000$ avg monthly revenue loss • Take immediate action on unusual spikes
+        </div>
+        <a href="{{ url_for('home') }}" class="back-link">← Back to Home</a>
+    </div>
+
+    <script>
+        const ctx = document.getElementById('cancellationChart').getContext('2d');
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: {{ months_json | safe }},
+                datasets: [{
+                    label: 'Cancellation Rate (%)',
+                    data:{{ rates_json | safe }},
+                    borderColor: '#EF4444',
+                    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 6,
+                    pointHoverRadius: 8,
+                    pointBackgroundColor: '#EF4444',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                        labels: {
+                            font: {
+                                size: 14,
+                                family: 'Segoe UI'
+                            },
+                            padding: 20
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: 'Cancellation Rate Trend Over Time',
+                        font: {
+                            size: 18,
+                            family: 'Segoe UI',
+                            weight: 'bold'
+                        },
+                        padding: 20,
+                        color: '#0052CC'
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 82, 204, 0.9)',
+                        titleFont: {
+                            size: 14
+                        },
+                        bodyFont: {
+                            size: 13
+                        },
+                        padding: 12,
+                        callbacks: {
+                            label: function (context) {
+                                return 'Cancellation Rate: ' + context.parsed.y + '%';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function (value) {
+                                return value + '%';
+                            },
+                            font: {
+                                size: 12
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Cancellation Percentage',
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            },
+                            color: '#666'
+                        },
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            font: {
+                                size: 12
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Month',
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            },
+                            color: '#666'
+                        },
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

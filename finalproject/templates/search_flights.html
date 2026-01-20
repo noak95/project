@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>FlyTAU - Search Flights</title>
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/flytau.png') }}?v=2">
+</head>
+
+<body>
+  <div class="page">
+    <div class="card">
+
+<div class="top-row">
+
+  {% if session.get('logged_in') %}
+    <div class="welcome">
+      <div class="welcome-left">
+        <span class="dot"></span>
+        <span class="text">
+          Welcome back, <span class="name">{{ session.get('username') }}</span>
+        </span>
+      </div>
+
+      <div class="welcome-actions">
+        <a href="{{ url_for('logout') }}">Logout</a>
+
+        {% if session.get('role') == 'manager' %}
+          <a href="{{ url_for('manager_home') }}">Manager Dashboard</a>
+          <details class="reports">
+          <summary>Reports</summary>
+          <div class="reports-menu">
+          <a href="{{ url_for('operational_report') }}">Operational</a>
+          <a href="{{ url_for('revenue_report') }}">Revenue</a>
+          <a href="{{ url_for('cancellation_report') }}">Cancellations</a>
+          </div>
+          </details>
+        {% else %}
+          <a href="{{ url_for('my_orders') }}">Previous Orders</a>
+        {% endif %}
+      </div>
+    </div>
+  {% else %}
+    <div class="auth-actions">
+      <a class="auth-link" href="{{ url_for('login') }}">Log in / Sign up</a>
+      <a class="auth-link" href="{{ url_for('find_order') }}">Find Order</a>
+    </div>
+  {% endif %}
+
+  <img class="page-logo" src="{{ url_for('static', filename='images/flytau.png') }}" alt="FLYTAU">
+
+</div>
+      <div class="header">
+        <p class ="motto">Discover Your Horizon. FlyTAU</p>
+      </div>
+
+      <p class="page-subtitle">Search for available flights</p>
+      <form class="form" method="POST">
+
+      <div class="field">
+        <label>Origin airport</label>
+        <select name="origin">
+          <option value="" disabled {{ 'selected' if not origin else '' }}>Choose origin</option>
+          {% for a in airports %}
+            <option value="{{ a }}" {{ 'selected' if a == origin else '' }}>{{ a }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Destination airport</label>
+        <select name="destination">
+          <option value="" disabled {{ 'selected' if not destination else '' }}>Choose destination</option>
+          {% for a in airports %}
+            <option value="{{ a }}" {{ 'selected' if a == destination else '' }}>{{ a }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="passengers">Passengers</label>
+        <input type="number" id="passengers" name="passengers" min="1"
+               value="{{ passengers if passengers else 1 }}" required>
+      </div>
+
+      <div class="field">
+        <div class="field">
+        <label for="date">Date</label>
+        <input type="date" id="date" name="date">
+        </div>
+
+      </div>
+
+        <button class="btn btn-primary" type="submit">
+          Search flights
+        </button>
+
+        {% if error %}
+          <div class="error">{{ error }}</div>
+        {% endif %}
+
+      </form>
+
+
+    </div>
+  </div>
+
+
+<script>
+  const dateInput = document.getElementById("date");
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const yyyy = today.getFullYear();
+  const mm = String(today.getMonth() + 1).padStart(2, "0");
+  const dd = String(today.getDate()).padStart(2, "0");
+  const todayStr = `${yyyy}-${mm}-${dd}`;
+  dateInput.min = todayStr;
+</script>
+
+
+
+
+
+
+</body>
+</html>

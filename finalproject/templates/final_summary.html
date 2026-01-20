@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FlyTAU | Final Summary</title>
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/flytau.png') }}?v=2">
+</head>
+
+<body>
+  <div class="page">
+    <div class="card">
+
+      <img class="page-logo" src="{{ url_for('static', filename='images/flytau.png') }}" alt="FLYTAU">
+
+      <div class="header" style="margin-top: 10px; padding: 0; background: none; box-shadow: none; border: none; min-height: auto;">
+        <h2 style="margin: 0;">✅ Thank you for your order!</h2>
+        <p class="subtitle" style="margin-top: 6px;">
+          Your booking is confirmed. Below is your final summary.
+        </p>
+      </div>
+
+
+      <div class="summary" style="margin-top: 18px;">
+        <div>
+          <div class="route">Order #{{ order[0] }}</div>
+          <div class="meta">
+            Flight <strong>{{ order[2] }}</strong> · Date <strong>{{ order[3] }}</strong> · Status <strong>{{ order[4] }}</strong>
+          </div>
+          <div class="meta">
+            Email: <strong>{{ order[1] }}</strong>
+          </div>
+        </div>
+
+        <div class="pill">
+          Total Paid: {{ "%.2f"|format(order[5]) }}
+        </div>
+      </div>
+
+
+      <div class="section">
+        <h2>Passenger details</h2>
+
+        {# person tuple: 0=f_name,1=l_name,2=birth_date,3=passport_num #}
+        {% if person %}
+          <div class="table-wrap" style="margin-top: 12px;">
+            <table>
+              <thead>
+                <tr>
+                  <th>Field</th>
+                  <th>Value</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>First name</td>
+                  <td>{{ person[0] }}</td>
+                </tr>
+                <tr>
+                  <td>Last name</td>
+                  <td>{{ person[1] }}</td>
+                </tr>
+
+                {% if person[2] %}
+
+                  <tr>
+                    <td>Account type</td>
+                    <td><span class="badge success">Registered Customer</span></td>
+                  </tr>
+                  <tr>
+                    <td>Birth date</td>
+                    <td>{{ person[2] }}</td>
+                  </tr>
+                  <tr>
+                    <td>Passport number</td>
+                    <td>{{ person[3] }}</td>
+                  </tr>
+                {% else %}
+
+                  <tr>
+                    <td>Account type</td>
+                    <td><span class="badge warning">Guest</span></td>
+                  </tr>
+                  <tr>
+                    <td>Note</td>
+                    <td>Guest bookings include only the details provided during checkout.</td>
+                  </tr>
+                {% endif %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <div class="warning" style="margin-top: 12px;">
+            Passenger details were not found in the system.
+          </div>
+        {% endif %}
+      </div>
+
+
+      <div class="section">
+        <h2>Selected seats</h2>
+
+        {% if seats and seats|length > 0 %}
+          <div class="table-wrap" style="margin-top: 12px;">
+            <table>
+              <thead>
+                <tr>
+                  <th>Class</th>
+                  <th>Seat</th>
+                  <th>Price</th>
+                </tr>
+              </thead>
+              <tbody>
+                {# seats rows: (class_type, row_num, column_letter, price_at_purchase) #}
+                {% for s in seats %}
+                  <tr>
+                    <td>{{ s[0] }}</td>
+                    <td>{{ s[1] }}{{ s[2] }}</td>
+                    <td>{{ "%.2f"|format(s[3]) }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <div class="error" style="margin-top: 12px;">
+            No seats were found for this order.
+          </div>
+        {% endif %}
+      </div>
+      {% if error %}
+        <div class ="error"> {{error}}</div>
+      {% endif %}
+      <div class="actions" style="margin-top: 22px;">
+        <a class="btn btn-primary" href="{{ url_for('home') }}">Back to flight search</a>
+      </div>
+
+    </div>
+  </div>
+</body>
+</html>

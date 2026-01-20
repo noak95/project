@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>FlyTAU – Add Airplane</title>
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/flytau.png') }}">
+</head>
+
+<body>
+
+  <div class="page">
+    <div class="card">
+
+      <img class="page-logo" src="{{ url_for('static', filename='images/flytau.png') }}" alt="FLYTAU">
+
+        <h1>Add new airplane</h1>
+
+      <form class="form" method="post" action="{{ url_for('add_airplane') }}">
+        <div class="field">
+          <label for="manufacturer">Manufacturer</label>
+          <select name="manufacturer" id="manufacturer" required>
+            <option value="" disabled selected>Select manufacturer</option>
+            <option value="Boeing">Boeing</option>
+            <option value="Airbus">Airbus</option>
+            <option value="Dassault">Dassault</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="date">Date Of Purchase</label>
+          <input type="date" id="date" name="date" required>
+        </div>
+
+        <div class="field">
+          <label>Plane Size</label>
+        <label class="pretty-radio">
+          <input type="radio" name="plane_size" value="big" required>
+          <span class="dot" aria-hidden="true"></span>
+          <span>Big</span>
+        </label>
+
+
+
+        <label class="pretty-radio">
+          <input type="radio" name="plane_size" value="small" required>
+          <span class="dot" aria-hidden="true"></span>
+          <span>Small</span>
+        </label>
+      </div>
+
+
+        <button class="btn btn-primary" type="submit">Continue to classes</button>
+      </form>
+
+      <div class="footer">
+        <a href="{{ url_for('manager_home') }}">← Back to dashboard</a>
+      </div>
+
+    </div>
+  </div>
+</body>
+</html>
