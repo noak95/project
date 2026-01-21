@@ -19,7 +19,7 @@ The system supports users and managers, enabling flight search, seat booking, or
 - Assign crew based on airplane size & flight duration
 - Cancel flights (with 72-hour rule)  
 - Add new employees (pilots / attendants)  
-- Add new airplanes to the flee
+- Add new airplanes to the fleet
 - View system-level reports and analytics
 
 ---
@@ -35,7 +35,7 @@ The system supports users and managers, enabling flight search, seat booking, or
   │   ├── *.html               
   │
   ├── flask_session_data/       
-  ├── __pycache__/              
+  ├── __pychache__/              
   │
   ├── main.py                   
   ├── utils.py                  
@@ -47,7 +47,7 @@ The system supports users and managers, enabling flight search, seat booking, or
   
 ## DATABASE
 **MySQL** -
-Schema includes: Users, Customers, Managers, Flights, Routes, Airplanes, Seats, Orders, Order Seats, Crew (Pilots, Flight Attendants)
+Schema includes: Users, Customers, Managers, Flights, Routes, Airplanes, Seats, Orders, Order Seats, Crew (Pilots, Flight Attendants)...
 
 ## Technologics Used
 - Python 3
@@ -70,6 +70,7 @@ Schema includes: Users, Customers, Managers, Flights, Routes, Airplanes, Seats, 
 ### Sagi Avni ###
 - Industrial Engineering & Managment
 - Final Project - Database and Information Systems
+- Group Number: 007
 
 
 
