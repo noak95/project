@@ -1,7 +1,7 @@
 # FlyTAU – Flight Management System
 ## Project overview
 - FlyTau is a flight managment and booking system built with Flask and MySQL.
-The system supports users and managers, enabling flight search, seat booking, order managment and full managerial control over flighs, crew, airplanes and reports viewing.
+The system supports users and managers, enabling flight search, seat booking, order managment and full managerial control over flights, crew, airplanes and reports viewing.
 ---
 ## Roles
 ### user / customer
