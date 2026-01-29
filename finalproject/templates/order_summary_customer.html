@@ -90,7 +90,7 @@
         {% else %}
           <input type="hidden" name="selected_seats" value="{{ selected_seats }}">
         {% endif %}
-      
+        </form>
         <div style="display:flex; justify-content:center; gap:10px; align-items:center; margin-top:12px;">
           <a class="btn btn-secondary"
              href="{{ url_for('seats_page', flight_num=flight_num, passengers=selected_seats|length) }}" style="width: auto;height: 48px;">
@@ -99,7 +99,7 @@
 
           <button class="btn btn-primary" type="submit" style="width:auto;">Confirm Order</button>
         </div>
-        </form>
+        
 
       <div class="footer">
         <a href="{{ url_for('home') }}">← Back to search</a>
